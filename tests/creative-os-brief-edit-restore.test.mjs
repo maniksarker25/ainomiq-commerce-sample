@@ -1,0 +1,37 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+
+const source = readFileSync(new URL('../app/dashboard/creative-os/components/CreativeOsWorkspace.tsx', import.meta.url), 'utf8');
+const postBriefsSource = readFileSync(new URL('../app/dashboard/creative-os/components/tabs/PostBriefsTab.tsx', import.meta.url), 'utf8');
+const deleteTaskSource = source.slice(source.indexOf('const deleteTask'), source.indexOf('const restoreTask'));
+const restoreTaskSource = source.slice(source.indexOf('const restoreTask'), source.indexOf('const taskSourceDraftValue'));
+const permanentDeleteTaskSource = source.slice(source.indexOf('const permanentlyDeleteTask'), source.indexOf('const taskSourceDraftValue'));
+const editBriefSource = source.slice(source.indexOf('const startEditingBrief'), source.indexOf('const addSourceLinks'));
+const postedBriefsStart = postBriefsSource.indexOf('title="Finished / Deleted briefs"');
+const postedBriefsUi = postBriefsSource.slice(postedBriefsStart, postBriefsSource.indexOf('title="Posted briefs"', postedBriefsStart + 1));
+const activePostedBriefsUi = postBriefsSource.slice(postBriefsSource.indexOf('title="Posted briefs"'), postBriefsSource.indexOf('title="Finished / Deleted briefs"'));
+
+assert.match(deleteTaskSource, /status: "archived" as TaskStatus/, 'Deleting a brief should soft-delete it as archived');
+assert.doesNotMatch(deleteTaskSource, /deletedTaskIds: uniqueStrings/, 'Deleting a brief should not permanently tombstone it');
+assert.match(deleteTaskSource, /deletedTaskIds: \(current\.deletedTaskIds \|\| \[\]\)\.filter\([\s\S]*\(id\) => id !== taskId/, 'Deleting keeps restore possible by clearing old tombstones');
+assert.match(restoreTaskSource, /status: "assigned" as TaskStatus/, 'Deleted briefs can be posted back to the assigned queue');
+assert.match(restoreTaskSource, /deletedTaskIds: \(current\.deletedTaskIds \|\| \[\]\)\.filter\([\s\S]*\(id\) => id !== taskId/, 'Restoring clears any old tombstone for that brief');
+assert.match(permanentDeleteTaskSource, /Permanently delete/, 'Deleted briefs can be permanently deleted with confirmation');
+assert.match(permanentDeleteTaskSource, /deletedTaskIds: uniqueStrings\(\[[\s\S]*\.\.\.\(current\.deletedTaskIds \|\| \[\]\),[\s\S]*taskId/, 'Permanent deletion tombstones the brief id');
+assert.match(permanentDeleteTaskSource, /tasks: current\.tasks\.filter\(\(item\) => item\.id !== taskId\)/, 'Permanent deletion removes the brief from state');
+assert.match(editBriefSource, /sourceCreativeId: taskSourceDraftValue\(task\)/, 'Brief edit mode includes source reassignment');
+assert.match(editBriefSource, /assignee: task\.assignee/, 'Brief edit mode includes editor reassignment');
+assert.match(editBriefSource, /angles: optionsText\(task\.angles, task\.angle\)/, 'Brief edit mode includes angles');
+assert.match(editBriefSource, /hooks: optionsText\(task\.hooks, task\.hook\)/, 'Brief edit mode includes hooks');
+assert.match(source, /const productFinishedTasks = productTasks\.filter\([\s\S]*task\.status === "delivered"/, 'Finished briefs are collected separately from active build briefs');
+assert.match(postedBriefsUi, /title="Finished \/ Deleted briefs"/, 'Finished and deleted briefs are visible in one history section');
+assert.match(postedBriefsUi, /finished[\s\S]*\{formatDate/, 'Finished briefs show finished history');
+assert.match(postedBriefsUi, /Restore brief/, 'Deleted briefs have a restore action');
+assert.match(postedBriefsUi, /Restore and edit/, 'Deleted briefs can be restored directly into edit mode');
+assert.match(postedBriefsUi, /Permanently delete brief/, 'Deleted briefs have an icon action for permanent delete');
+assert.match(activePostedBriefsUi, /layout="full"/, 'Posted briefs use full-width layout');
+assert.match(activePostedBriefsUi, /BriefEditDialog/, 'Brief editing opens in a dialog');
+assert.match(activePostedBriefsUi, /PostedBriefCard/, 'Posted briefs use compact full-width cards');
+assert.match(postedBriefsUi, /Edit finished brief/, 'Finished briefs can enter full edit mode');
+assert.match(editBriefSource, /editorAssigneeValue|resolveBriefAssignee/, 'Brief save normalizes editor assignee to email');
+assert.match(editBriefSource, /briefEditHasStructuralChanges/, 'Finished brief edits distinguish structural changes');

@@ -1,0 +1,34 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "d821e136cfecb42855809fbb484dbbf4"
+name = "ainomiq"
+application_url = "https://app.ainomiq.com"
+embedded = false
+
+[access_scopes]
+# Updated to match the comprehensive list from your successful test
+scopes = "read_analytics,read_customers,write_customers,read_price_rules,write_price_rules,read_discounts,write_discounts,write_draft_orders,read_draft_orders,read_fulfillments,write_fulfillments,read_gift_cards,write_gift_cards,write_inventory,read_inventory,read_locales,read_locations,read_markets,read_orders,write_orders,read_products,write_products,read_reports,read_returns,read_shipping,read_content,read_themes"
+
+[auth]
+redirect_urls = [
+  "https://app.ainomiq.com/api/auth/shopify/callback",
+  "https://app.ainomiq.com/api/auth/shopify/install"
+]
+
+[webhooks]
+api_version = "2026-07"
+
+  [[webhooks.subscriptions]]
+  uri = "/api/webhooks/shopify/customers-data-request"
+  compliance_topics = [ "customers/data_request" ]
+
+  [[webhooks.subscriptions]]
+  uri = "/api/webhooks/shopify/customers-redact"
+  compliance_topics = [ "customers/redact" ]
+
+  [[webhooks.subscriptions]]
+  uri = "/api/webhooks/shopify/shop-redact"
+  compliance_topics = [ "shop/redact" ]
+
+[build]
+automatically_update_urls_on_dev = true
