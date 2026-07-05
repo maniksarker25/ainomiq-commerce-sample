@@ -1,0 +1,15 @@
+{
+  "name": "ainomiq-voice-relay",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "ws": "^8.18.0",
+    "@libsql/client": "^0.14.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

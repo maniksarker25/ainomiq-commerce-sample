@@ -1,0 +1,19 @@
+{
+  "git": {
+    "deploymentEnabled": false
+  },
+  "crons": [
+    {
+      "path": "/api/cron/cs-email",
+      "schedule": "*/2 * * * *"
+    },
+    {
+      "path": "/api/cron/content-publish",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/cron/ad-publish",
+      "schedule": "*/2 * * * *"
+    }
+  ]
+}
