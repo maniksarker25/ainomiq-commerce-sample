@@ -1,0 +1,12 @@
+-- 001_baseline.sql — current schema baseline
+--
+-- The original app creates its schema at runtime via CREATE TABLE IF NOT EXISTS
+-- inside lib/db.ts (initDb). That is being replaced by this migrations system.
+--
+-- TO POPULATE THIS FILE (tech lead, one-time):
+--   turso db shell <db> ".schema" > db/migrations/001_baseline.sql
+-- then prepend this header. After that, NEVER add ad-hoc ALTER TABLE to
+-- lib/db.ts — add a new numbered migration (002_*.sql, 003_*.sql, ...) instead.
+--
+-- This placeholder intentionally contains no statements so the runner is a
+-- no-op until the real schema is dumped in.
